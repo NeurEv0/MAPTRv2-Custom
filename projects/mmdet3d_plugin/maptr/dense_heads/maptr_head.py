@@ -267,7 +267,9 @@ class MapTRHead(DETRHead):
                 prev_bev=prev_bev
         )
 
-        bev_embed, hs, init_reference, inter_references = outputs
+        # Transformer returns a 5-tuple incl. `depth` (LSS-only). v1 BEVFormer
+        # encoder has no depth; we drop it here for backward-compat.
+        bev_embed, _depth, hs, init_reference, inter_references = outputs
         hs = hs.permute(0, 2, 1, 3)
         outputs_classes = []
         outputs_coords = []

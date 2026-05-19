@@ -201,7 +201,7 @@ class MapTRPerceptionTransformer(BaseModule):
         feat_flatten = feat_flatten.permute(
             0, 2, 1, 3)  # (num_cam, H*W, bs, embed_dims)
 
-        ret_dict = self.encoder(
+        bev_embed = self.encoder(
             bev_queries,
             feat_flatten,
             feat_flatten,
@@ -215,7 +215,9 @@ class MapTRPerceptionTransformer(BaseModule):
             shift=shift,
             **kwargs
         )
-        return ret_dict
+        # `get_bev_features` expects a dict with keys 'bev' and 'depth'. The
+        # BEVFormer encoder returns just the BEV tensor; depth is LSS-only.
+        return dict(bev=bev_embed, depth=None)
 
     def lss_bev_encode(
             self,

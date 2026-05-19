@@ -145,7 +145,7 @@ dmypy.json
 .pyre/
 
 # Windows Zone.Identifier files (created when downloading files on Windows)
-*:Zone.Identifier
+*Zone.Identifier
 
 cluster.sh
 
