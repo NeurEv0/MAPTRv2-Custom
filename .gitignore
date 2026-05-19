@@ -144,6 +144,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Windows Zone.Identifier files (created when downloading files on Windows)
+*:Zone.Identifier
+
 cluster.sh
 
 data
