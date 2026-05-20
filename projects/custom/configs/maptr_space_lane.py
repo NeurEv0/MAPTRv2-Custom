@@ -321,7 +321,7 @@ lr_config = dict(
 )
 total_epochs = 24
 evaluation = dict(
-    interval=2,
+    interval=1,
     pipeline=test_pipeline,
     metric='chamfer',
     save_best='SpaceLane_chamfer/mAP',
@@ -329,6 +329,6 @@ evaluation = dict(
 )
 
 runner = dict(type='EpochBasedRunner', max_epochs=total_epochs)
-checkpoint_config = dict(max_keep_ckpts=2, interval=2)
+checkpoint_config = dict(max_keep_ckpts=1, interval=1)
 fp16 = dict(loss_scale=512.)
 find_unused_parameters = True

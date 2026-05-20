@@ -205,7 +205,11 @@ class SpaceLaneDataset(Custom3DDataset):
         input_dict = self.get_data_info(index)
         self.pre_pipeline(input_dict)
         example = self.pipeline(input_dict)
-        return self._wrap_queue_one(example)
+        # NOTE: test pipeline uses MultiScaleFlipAug3D which wraps img and
+        # img_metas as lists keyed by aug index. The model's forward_test
+        # consumes this list shape directly and does not want a queue dim.
+        # Only the train path applies `_wrap_queue_one`.
+        return example
 
     def __getitem__(self, idx):
         if self.test_mode:
