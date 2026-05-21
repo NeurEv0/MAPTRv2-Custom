@@ -1,14 +1,19 @@
 """MapTR (v1, BEVFormer encoder) trained on the in-house SpaceLane dataset.
+
+110-epoch schedule — mirrors maptr_tiny_r50_110e.py (nuScenes) adapted for
+SpaceLane, inheriting the same model architecture as maptr_space_lane.py with:
+  - total_epochs 24 → 110
+  - warmup_iters 200 → 500  (~0.6 epoch; appropriate for a longer schedule)
+  - evaluation interval 1 → 2  (saves ~1 h over the full run)
+  - checkpoint interval 1 → 5, max_keep_ckpts 1 → 2  (saves disk space)
+  - fp16 loss_scale 512 (fixed) → 'dynamic'  (prevents the grad_norm NaN seen
+    in the 24-epoch run, where FP16 overflow was silently skipping updates)
 """
 
 _base_ = [
     '../../configs/_base_/default_runtime.py',
 ]
 
-# Make the registry pick up:
-#   - SpaceLaneDataset  (projects.custom.datasets)
-#   - ResizeMultiViewImageToFixed (projects.custom.pipelines)
-#   - MapTR head / encoder / decoder / transforms (projects.mmdet3d_plugin)
 plugin = True
 plugin_dir = 'projects/mmdet3d_plugin/'
 custom_imports = dict(
@@ -26,12 +31,11 @@ map_classes = [
 ]
 num_map_classes = len(map_classes)
 
-num_vec = 100                       # # of polyline queries
-fixed_ptsnum_per_gt_line = 40       # matches converter
+num_vec = 100
+fixed_ptsnum_per_gt_line = 40
 fixed_ptsnum_per_pred_line = 40
 eval_use_same_gt_sample_num_flag = True
 
-# Camera input target (after ResizeMultiViewImageToFixed)
 input_h, input_w = 480, 800
 
 img_norm_cfg = dict(
@@ -54,9 +58,9 @@ _pos_dim_ = _dim_ // 2
 _ffn_dim_ = _dim_ * 2
 _num_levels_ = 1
 bev_h_ = 200
-bev_w_ = 200                         # square because our perception range is 50x50
+bev_w_ = 200
 
-queue_length = 1                     # single-frame, no temporal queue
+queue_length = 1
 
 # -------- model --------
 model = dict(
@@ -104,7 +108,6 @@ model = dict(
         code_weights=[1.0, 1.0, 1.0, 1.0],
         transformer=dict(
             type='MapTRPerceptionTransformer',
-            # No temporal queue, no nuScenes can_bus
             rotate_prev_bev=False,
             use_shift=False,
             use_can_bus=False,
@@ -213,6 +216,11 @@ model = dict(
     )),
 )
 
+# Optional: warm-start from the 24-epoch best checkpoint.
+# The head and decoder weights carry over; backbone is re-initialised from
+# the pretrained key above unless you also comment out `pretrained` above.
+# load_from = 'work_dirs/maptr_space_lane/best_SpaceLane_chamfer/mAP_epoch_24.pth'
+
 # -------- dataset --------
 dataset_type = 'SpaceLaneDataset'
 data_root = 'data/space_samples/'
@@ -300,7 +308,7 @@ data = dict(
     nonshuffler_sampler=dict(type='DistributedSampler'),
 )
 
-# -------- optim --------
+# -------- optim / schedule --------
 optimizer = dict(
     type='AdamW',
     lr=6e-4,
@@ -311,13 +319,13 @@ optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 lr_config = dict(
     policy='CosineAnnealing',
     warmup='linear',
-    warmup_iters=200,
+    warmup_iters=500,           # ~0.6 epoch at 846 iters/epoch
     warmup_ratio=1.0 / 3,
     min_lr_ratio=1e-3,
 )
-total_epochs = 24
+total_epochs = 110
 evaluation = dict(
-    interval=1,
+    interval=2,
     pipeline=test_pipeline,
     metric='chamfer',
     save_best='SpaceLane_chamfer/mAP',
@@ -325,6 +333,6 @@ evaluation = dict(
 )
 
 runner = dict(type='EpochBasedRunner', max_epochs=total_epochs)
-checkpoint_config = dict(max_keep_ckpts=1, interval=1)
+checkpoint_config = dict(max_keep_ckpts=2, interval=5)
 fp16 = dict(loss_scale='dynamic')
 find_unused_parameters = True

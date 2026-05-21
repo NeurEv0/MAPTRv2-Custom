@@ -10,7 +10,7 @@ Train a BEV polyline detector that pre-annotates "no-go" boundaries (parked cars
 columns, walls, curbs, other obstacles) from 10-camera surround imagery, so the
 labeling team gets a strong starting point instead of drawing every line by hand.
 Output schema matches the existing `annotation.json` format the labeling tool
-consumes (`way`, `line`, `node`, `segment`, `other`).
+consumes (`way`, `line`, `node`, `segment`, `other`,...).
 
 ## Domain
 
@@ -301,10 +301,6 @@ under the `SpaceLane_chamfer/*` namespace.
 
 ## Known issues / things deferred
 
-- **`--resume-from` from a mid-training checkpoint sometimes produces NaN on the
-  first iter** — AdamW second-moment estimates appear to interact badly with the
-  restored LR. Workaround: start fresh, or use `--cfg-options load_from=…`
-  (model weights only, fresh optimizer).
 - **`other` rects** (62 / 160 samples have 1–4 bounding rectangles) are not
   predicted. If labelers need them, easiest fix is to convert each rect to a
   4-vertex polyline at conversion time and label it as a sixth class.
