@@ -152,3 +152,5 @@ cluster.sh
 data
 
 .claude
+.codex
+.vscode
