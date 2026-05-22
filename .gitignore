@@ -151,6 +151,9 @@ cluster.sh
 
 data
 
+# agent
 .claude
 .codex
+.agents
+
 .vscode
