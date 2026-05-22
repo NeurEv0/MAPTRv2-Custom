@@ -8,6 +8,9 @@ import logging
 from pathlib import Path
 from os import path as osp
 import os
+from numpy_compat import ensure_numpy_typing
+
+ensure_numpy_typing()
 from av2.datasets.sensor.av2_sensor_dataloader import AV2SensorDataLoader
 from av2.map.lane_segment import LaneMarkType, LaneSegment
 from av2.map.map_api import ArgoverseStaticMap
@@ -609,13 +612,13 @@ def extract_local_boundary(avm, ego_SE3_city, patch_box, patch_angle,patch_size)
         if polygon.is_valid:
             new_polygon = polygon.intersection(patch)
             if not new_polygon.is_empty:
-                if new_polygon.geom_type is 'Polygon':
+                if new_polygon.geom_type == 'Polygon':
                     if not new_polygon.is_valid:
                         continue
                     new_polygon = proc_polygon(new_polygon,ego_SE3_city)
                     if not new_polygon.is_valid:
                         continue
-                elif new_polygon.geom_type is 'MultiPolygon':
+                elif new_polygon.geom_type == 'MultiPolygon':
                     polygons = []
                     for single_polygon in new_polygon.geoms:
                         if not single_polygon.is_valid or single_polygon.is_empty:
@@ -632,7 +635,7 @@ def extract_local_boundary(avm, ego_SE3_city, patch_box, patch_angle,patch_size)
                 else:
                     raise ValueError('{} is not valid'.format(new_polygon.geom_type))
 
-                if new_polygon.geom_type is 'Polygon':
+                if new_polygon.geom_type == 'Polygon':
                     new_polygon = MultiPolygon([new_polygon])
                 polygon_list.append(new_polygon)
 
@@ -696,13 +699,13 @@ def extract_local_ped_crossing(avm, ego_SE3_city, patch_box, patch_angle,patch_s
         if polygon.is_valid:
             new_polygon = polygon.intersection(patch)
             if not new_polygon.is_empty:
-                if new_polygon.geom_type is 'Polygon':
+                if new_polygon.geom_type == 'Polygon':
                     if not new_polygon.is_valid:
                         continue
                     new_polygon = proc_polygon(new_polygon,ego_SE3_city)
                     if not new_polygon.is_valid:
                         continue
-                elif new_polygon.geom_type is 'MultiPolygon':
+                elif new_polygon.geom_type == 'MultiPolygon':
                     polygons = []
                     for single_polygon in new_polygon.geoms:
                         if not single_polygon.is_valid or single_polygon.is_empty:
@@ -719,7 +722,7 @@ def extract_local_ped_crossing(avm, ego_SE3_city, patch_box, patch_angle,patch_s
                 else:
                     raise ValueError('{} is not valid'.format(new_polygon.geom_type))
 
-                if new_polygon.geom_type is 'Polygon':
+                if new_polygon.geom_type == 'Polygon':
                     new_polygon = MultiPolygon([new_polygon])
                 polygon_list.append(new_polygon)
 

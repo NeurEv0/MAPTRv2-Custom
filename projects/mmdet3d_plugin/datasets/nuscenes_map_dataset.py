@@ -794,7 +794,7 @@ class VectorizedLocalMap(object):
                                                       origin=(patch_x, patch_y), use_radians=False)
                         new_polygon = affinity.affine_transform(new_polygon,
                                                                 [1.0, 0.0, 0.0, 1.0, -patch_x, -patch_y])
-                        if new_polygon.geom_type is 'Polygon':
+                        if new_polygon.geom_type == 'Polygon':
                             new_polygon = MultiPolygon([new_polygon])
                         polygon_list.append(new_polygon)
 
@@ -809,7 +809,7 @@ class VectorizedLocalMap(object):
                                                       origin=(patch_x, patch_y), use_radians=False)
                         new_polygon = affinity.affine_transform(new_polygon,
                                                                 [1.0, 0.0, 0.0, 1.0, -patch_x, -patch_y])
-                        if new_polygon.geom_type is 'Polygon':
+                        if new_polygon.geom_type == 'Polygon':
                             new_polygon = MultiPolygon([new_polygon])
                         polygon_list.append(new_polygon)
 
@@ -819,7 +819,7 @@ class VectorizedLocalMap(object):
         if layer_name not in self.map_explorer[location].map_api.non_geometric_line_layers:
             raise ValueError("{} is not a line layer".format(layer_name))
 
-        if layer_name is 'traffic_light':
+        if layer_name == 'traffic_light':
             return None
 
         patch_x = patch_box[0]
@@ -860,7 +860,7 @@ class VectorizedLocalMap(object):
                                                       origin=(patch_x, patch_y), use_radians=False)
                     new_polygon = affinity.affine_transform(new_polygon,
                                                             [1.0, 0.0, 0.0, 1.0, -patch_x, -patch_y])
-                    if new_polygon.geom_type is 'Polygon':
+                    if new_polygon.geom_type == 'Polygon':
                         new_polygon = MultiPolygon([new_polygon])
                     polygon_list.append(new_polygon)
 

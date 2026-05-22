@@ -24,6 +24,9 @@ from mmdet.datasets.pipelines import to_tensor
 import json
 
 from pathlib import Path
+from numpy_compat import ensure_numpy_typing
+
+ensure_numpy_typing()
 from av2.datasets.sensor.av2_sensor_dataloader import AV2SensorDataLoader
 from av2.map.lane_segment import LaneMarkType, LaneSegment
 from av2.map.map_api import ArgoverseStaticMap
@@ -632,13 +635,13 @@ class VectorizedAV2LocalMap(object):
                     new_polygon = polygon.intersection(patch)
                     if not new_polygon.is_empty:
                         # import pdb;pdb.set_trace()
-                        if new_polygon.geom_type is 'Polygon':
+                        if new_polygon.geom_type == 'Polygon':
                             if not new_polygon.is_valid:
                                 continue
                             new_polygon = self.proc_polygon(new_polygon,ego_SE3_city)
                             if not new_polygon.is_valid:
                                 continue
-                        elif new_polygon.geom_type is 'MultiPolygon':
+                        elif new_polygon.geom_type == 'MultiPolygon':
                             polygons = []
                             for single_polygon in new_polygon.geoms:
                                 if not single_polygon.is_valid or single_polygon.is_empty:
@@ -654,7 +657,7 @@ class VectorizedAV2LocalMap(object):
                                 continue
                         else:
                             raise ValueError('{} is not valid'.format(new_polygon.geom_type))
-                        if new_polygon.geom_type is 'Polygon':
+                        if new_polygon.geom_type == 'Polygon':
                             new_polygon = MultiPolygon([new_polygon])
                         polygon_list.append(new_polygon)
             else:
@@ -676,13 +679,13 @@ class VectorizedAV2LocalMap(object):
             if polygon.is_valid:
                 new_polygon = polygon.intersection(patch)
                 if not new_polygon.is_empty:
-                    if new_polygon.geom_type is 'Polygon':
+                    if new_polygon.geom_type == 'Polygon':
                         if not new_polygon.is_valid:
                             continue
                         new_polygon = self.proc_polygon(new_polygon,ego_SE3_city)
                         if not new_polygon.is_valid:
                             continue
-                    elif new_polygon.geom_type is 'MultiPolygon':
+                    elif new_polygon.geom_type == 'MultiPolygon':
                         polygons = []
                         for single_polygon in new_polygon.geoms:
                             if not single_polygon.is_valid or single_polygon.is_empty:
@@ -699,7 +702,7 @@ class VectorizedAV2LocalMap(object):
                     else:
                         raise ValueError('{} is not valid'.format(new_polygon.geom_type))
 
-                    if new_polygon.geom_type is 'Polygon':
+                    if new_polygon.geom_type == 'Polygon':
                         new_polygon = MultiPolygon([new_polygon])
                     polygon_list.append(new_polygon)
         map_ped_geom.append(('ped_crossing',polygon_list))
